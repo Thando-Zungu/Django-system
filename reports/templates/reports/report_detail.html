@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4>Report #{{ report.reference_number }}</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Category:</strong> {{ report.get_category_display }}</p>
+        <p><strong>Description:</strong> {{ report.description }}</p>
+        <p><strong>Status:</strong> 
+            <span class="badge 
+                {% if report.status == 'pending' %}bg-danger
+                {% elif report.status == 'logged' %}bg-warning
+                {% elif report.status == 'in_progress' %}bg-info
+                {% else %}bg-success{% endif %}">
+                {{ report.get_status_display }}
+            </span>
+        </p>
+        <p><strong>Address:</strong> {{ report.address|default:"Not provided" }}</p>
+        <p><strong>Submitted:</strong> {{ report.created_at|date:"d M Y H:i" }}</p>
+        <p><strong>Last update:</strong> {{ report.updated_at|date:"d M Y H:i" }}</p>
+        {% if report.photo %}
+            <p><strong>Photo:</strong><br><img src="{{ report.photo.url }}" class="img-fluid rounded" style="max-height: 300px;"></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Reports</h2>
+<div class="row">
+    {% for report in reports %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ report.get_category_display }}</h5>
+                <p class="card-text text-muted small">Ref: {{ report.reference_number }}</p>
+                <p class="card-text">{{ report.description|truncatechars:100 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge status-badge 
+                        {% if report.status == 'pending' %}status-pending
+                        {% elif report.status == 'logged' %}status-logged
+                        {% elif report.status == 'in_progress' %}status-in_progress
+                        {% else %}status-resolved{% endif %}">
+                        <i class="bi 
+                            {% if report.status == 'pending' %}bi-clock
+                            {% elif report.status == 'logged' %}bi-send
+                            {% elif report.status == 'in_progress' %}bi-gear
+                            {% else %}bi-check-circle{% endif %}"></i>
+                        {{ report.get_status_display }}
+                    </span>
+                    <a href="{% url 'report_detail' report.id %}" class="btn btn-sm btn-outline-primary">Details</a>
+                </div>
+            </div>
+            <div class="card-footer text-muted small">
+                Submitted: {{ report.created_at|date:"d M Y" }}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col">
+        <div class="alert alert-info">You haven't submitted any reports yet. <a href="{% url 'submit_report' %}">Report an issue</a>.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

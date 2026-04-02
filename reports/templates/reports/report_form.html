@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Report an Issue</h2>
+<form method="post" enctype="multipart/form-data" id="reportForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <div class="mb-3">
+        <label class="form-label">Location</label>
+        <div class="input-group">
+            <input type="text" name="address" id="address" class="form-control" placeholder="Address">
+            <button type="button" class="btn btn-outline-secondary" id="useLocationBtn">📍 Use my location</button>
+        </div>
+        <input type="hidden" name="location_lat" id="location_lat">
+        <input type="hidden" name="location_lng" id="location_lng">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Photo (optional, max 5MB)</label>
+        <input type="file" name="photo" id="photoInput" class="form-control" accept="image/*">
+        <img id="photoPreview" class="photo-preview img-thumbnail mt-2" style="display:none;">
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="submitBtn">
+        <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+        Submit Report
+    </button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Photo preview
+    document.getElementById('photoInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size exceeds 5MB. Please choose a smaller image.');
+                this.value = '';
+                document.getElementById('photoPreview').style.display = 'none';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('photoPreview');
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('photoPreview').style.display = 'none';
+        }
+    });
+
+    // Use my location
+    document.getElementById('useLocationBtn').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                document.getElementById('location_lat').value = position.coords.latitude;
+                document.getElementById('location_lng').value = position.coords.longitude;
+                document.getElementById('address').value = `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
+            }, function(error) {
+                alert('Unable to get your location. Please enter address manually.');
+            });
+        } else {
+            alert('Geolocation not supported by your browser.');
+        }
+    });
+
+    // Loading spinner on submit
+    document.getElementById('reportForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        document.getElementById('spinner').classList.remove('d-none');
+    });
+</script>
+{% endblock %}
