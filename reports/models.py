@@ -36,3 +36,8 @@ class Report(models.Model):
 
     def __str__(self):
         return f"{self.reference_number} - {self.category}"
+    
+
+
+
+    
